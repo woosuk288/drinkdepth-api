@@ -1,0 +1,60 @@
+ rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+  	function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function increment(current, next) {
+    	return current + 1 == next
+    }
+
+    function decrement(current, next) {
+    	return current - 1 == next
+    }
+
+    match /{document=**} {
+      // drinkdepth o2o for cafe menu
+      match /coupons/{entry} {
+        allow read;
+        allow write: if request.auth.uid != null;
+      }
+			match /registers/{entry} {
+        allow read;
+        allow create;
+        // allow write;
+      }
+    }
+
+    match /cafes/{cafeId} {
+    	allow read;
+
+    	match /menus/{menuId} {
+        function onlyContentChanged() {
+          // Ensure that title and roles are unchanged and that no new
+          // fields are added to the document.
+          return request.resource.data.cafeId == resource.data.cafeId
+            && request.resource.data.category == resource.data.category
+            && request.resource.data.createdAt == resource.data.createdAt
+            && request.resource.data.description == resource.data.description
+            && request.resource.data.imageURL == resource.data.imageURL
+            && request.resource.data.labels == resource.data.labels
+            && request.resource.data.name == resource.data.name
+            && request.resource.data.price == resource.data.price
+            && request.resource.data.keys() == resource.data.keys();
+        }
+
+      	allow read;
+        allow update: if isSignedIn() && onlyContentChanged() && increment(resource.data.reviewCount, request.resource.data.reviewCount);
+      	allow update: if isSignedIn() && onlyContentChanged() && decrement(resource.data.reviewCount, request.resource.data.reviewCount);
+
+      	match /reviews/{reviewId} {
+          allow read;
+        	allow update, delete: if request.auth.uid == resource.data.uid;
+        	allow create: if request.auth.uid != null;
+        }
+      }
+    }
+  }
+}

@@ -1,16 +1,19 @@
 import * as functions from "firebase-functions";
 
-import * as admin from "firebase-admin";
+// import * as admin from "firebase-admin";
 import * as express from "express";
-import * as serviceAccount from "./serviceAccount.json";
+// import * as serviceAccount from "./serviceAccount.json";
 import * as cors from "cors";
 
 import kakaoRouter from "./kakao.router";
+// import testRouter from "./test.router";
 // 어드민 초기화. 클라우드 함수, 호스팅만 사용할 경우 따로 설정파일을 넘겨주지 않아도 됨
 // 커스텀 인증(kakao 처리용) 사용하므로 serviceAccount 필요
-admin.initializeApp({
-  credential: admin.credential.cert(<admin.ServiceAccount>serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(<admin.ServiceAccount>serviceAccount),
+// });
+require("./db");
+
 const app = express();
 
 const whitelist = [
@@ -39,5 +42,6 @@ app.use(function (req, res, next) {
 });
 app.use(cors(corsOptions));
 app.use("/kakao", kakaoRouter);
+// app.use("/test", testRouter);
 
 export const api = functions.region("asia-northeast3").https.onRequest(app);
