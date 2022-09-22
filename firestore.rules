@@ -25,6 +25,12 @@ service cloud.firestore {
         allow create;
         // allow write;
       }
+
+    }
+
+    // 빌드시 조회용
+    match /{path=**}/menus/{menuId} {
+      allow list;
     }
 
     match /cafes/{cafeId} {
