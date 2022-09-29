@@ -21,6 +21,8 @@ const whitelist = [
   "https://drinkdepth.com",
   "https://stage.drinkdepth.com",
   "https://www.drinkdepth.com",
+  "https://offlineqr.drinkdepth.com",
+  "https://offlineqrtablet.drinkdepth.com",
   "localhost:5001",
   "localhost:5000",
 ];
@@ -42,6 +44,7 @@ app.use(function (req, res, next) {
 });
 app.use(cors(corsOptions));
 app.use("/kakao", kakaoRouter);
+// TODO: app.use("/owner", ownerRouter);
 // app.use("/test", testRouter);
 
 export const api = functions.region("asia-northeast3").https.onRequest(app);
