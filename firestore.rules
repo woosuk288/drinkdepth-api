@@ -28,7 +28,7 @@ service cloud.firestore {
 
     }
 
-    // 빌드시 조회용
+    // 개발 및 빌드시 조회용
     match /{path=**}/menus/{menuId} {
       allow list;
     }
@@ -54,6 +54,8 @@ service cloud.firestore {
       	allow read;
         allow update: if isSignedIn() && onlyContentChanged() && increment(resource.data.reviewCount, request.resource.data.reviewCount);
       	allow update: if isSignedIn() && onlyContentChanged() && decrement(resource.data.reviewCount, request.resource.data.reviewCount);
+        // development 이미지 수정시
+        allow create, update: if request.auth.token.admin == true;
 
       	match /reviews/{reviewId} {
           allow get;

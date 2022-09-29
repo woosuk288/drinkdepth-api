@@ -5,6 +5,7 @@ import { db /* , FieldValue */ } from "./db";
 
 import * as path from "path";
 import * as fs from "fs";
+import { auth } from "firebase-admin";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.get("/cafes", async (req, res) => {
   res.status(200).send(`Hello /test/cafes function!`);
 });
 
-router.get("/menus", async (req, res) => {
+router.post("/menus/files", async (req, res) => {
   const batch = db.batch();
 
   const cafeId = "babacarmel";
@@ -83,6 +84,83 @@ router.get("/images", async (req, res) => {
 });
 
 export default router;
+
+/**
+ * 커스텀 클레임 설정
+ */
+
+router.post("/claims", async (req, res) => {
+  // Set admin privilege on the user corresponding to uid.
+
+  const uid = "kakao:2336824408";
+
+  // const customUserClaims = { admin: true };
+  // await auth().setCustomUserClaims(uid, customUserClaims);
+
+  const userRecord = await auth().getUser(uid);
+  console.log("userRecord.customClaims : ", userRecord.customClaims);
+  // const currentCustomClaims = userRecord.customClaims;
+
+  // if (currentCustomClaims['admin']) {
+  //   // Add level.
+  //   currentCustomClaims['accessLevel'] = 10;
+  //   // Add custom claims for additional privileges.
+  //   return auth().setCustomUserClaims(uid, currentCustomClaims);
+  // }
+
+  res.status(200).send(`Hello create /claims function!`);
+});
+
+router.post("/menus", async (req, res) => {
+  const menus = req.body;
+
+  const batch = db.batch();
+
+  const cafeId = "babacarmel";
+
+  menus.forEach((menu) => {
+    const { id, ...data } = menu;
+    const docRef = db.collection(CAFES).doc(cafeId).collection(MENUES).doc(id);
+    batch.set(docRef, { ...data, createdAt: new Date(data.createdAt) });
+  });
+
+  const result = await batch.commit();
+
+  res.status(200).send(`Hello create /menus function! ${result.length}`);
+});
+
+router.get("/menus", async (req, res) => {
+  const cafeId = "babacarmel";
+
+  const q = await db.collection(CAFES).doc(cafeId).collection(MENUES).get();
+
+  const result = q.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+    createdAt: doc.data().createdAt.toDate(),
+  }));
+
+  res.status(200).send(result);
+});
+
+router.get("/menu/:menuId", async (req, res) => {
+  const cafeId = "babacarmel";
+
+  const menuDoc = await db
+    .collection(CAFES)
+    .doc(cafeId)
+    .collection(MENUES)
+    .doc(req.params.menuId)
+    .get();
+
+  const result = {
+    ...menuDoc.data(),
+    id: menuDoc.id,
+    createdAt: menuDoc.data().createdAt.toDate(),
+  };
+
+  res.status(200).send(result);
+});
 
 const testCafes = [
   {
