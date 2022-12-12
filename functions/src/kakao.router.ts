@@ -6,6 +6,7 @@ import { CreateRequest } from "firebase-admin/lib/auth/auth-config";
 import { Response } from "express-serve-static-core";
 import { UserRecord } from "firebase-admin/lib/auth/user-record";
 import * as url from "url";
+import { PROFILES } from "./constants";
 
 const router = express.Router();
 
@@ -97,7 +98,8 @@ function updateOrCreateUser(
   userId: string,
   email: string,
   displayName: string,
-  photoURL: string
+  photoURL: string,
+  phoneNumber: string
 ) {
   console.log("updating or creating a firebase user");
   const updateParams: CreateRequest & { provider: string } = {
@@ -123,7 +125,31 @@ function updateOrCreateUser(
         if (email) {
           updateParams["email"] = email;
         }
-        return firebaseAdmin.auth().createUser(updateParams);
+        updateParams["phoneNumber"] = phoneNumber;
+        return firebaseAdmin
+          .auth()
+          .createUser(updateParams)
+          .then((userRecord) => {
+            const {
+              uid,
+              displayName,
+              photoURL,
+              metadata: { creationTime },
+            } = userRecord;
+
+            const id = uid.split(":").length === 1 ? uid : uid.split(":")[1];
+
+            return firebaseAdmin
+              .firestore()
+              .collection(PROFILES)
+              .doc(id)
+              .set({
+                displayName,
+                photoURL,
+                createdAt: new Date(creationTime),
+                provider: "KAKAO",
+              });
+          });
       }
       throw error;
     });
@@ -144,6 +170,7 @@ function createFirebaseToken(
     .then((response) => {
       const body = response.data;
       console.log(body);
+      // const userId = `kakao:${body.id}`;
       const userId = `kakao:${body.id}`;
       if (!userId) {
         res
@@ -156,15 +183,22 @@ function createFirebaseToken(
         nickname = body.properties.nickname;
         profileImage = body.properties.profile_image;
       }
+      let phone_number = null;
+      if (body.kakao_account) {
+        phone_number = body.kakao_account.phone_number;
+      }
+
       return updateOrCreateUser(
         userId,
         body.kaccount_email,
         nickname,
-        profileImage
+        profileImage,
+        phone_number
       );
     })
-    .then((userRecord: UserRecord) => {
+    .then(async (userRecord: UserRecord) => {
       const userId = userRecord.uid;
+
       console.log(`creating a custom firebase token based on uid ${userId}`);
       return firebaseAdmin
         .auth()
