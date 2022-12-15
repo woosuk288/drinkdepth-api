@@ -112,9 +112,16 @@ function updateOrCreateUser(
   } else {
     updateParams["displayName"] = email;
   }
+  if (email) {
+    updateParams["email"] = email;
+  }
+  if (phoneNumber) {
+    updateParams["phoneNumber"] = phoneNumber;
+  }
   if (photoURL) {
     updateParams["photoURL"] = photoURL;
   }
+
   console.log(updateParams);
   return firebaseAdmin
     .auth()
@@ -122,10 +129,7 @@ function updateOrCreateUser(
     .catch((error) => {
       if (error.code === "auth/user-not-found") {
         updateParams["uid"] = userId;
-        if (email) {
-          updateParams["email"] = email;
-        }
-        updateParams["phoneNumber"] = phoneNumber;
+
         return firebaseAdmin
           .auth()
           .createUser(updateParams)
@@ -184,13 +188,15 @@ function createFirebaseToken(
         profileImage = body.properties.profile_image;
       }
       let phone_number = null;
+      let email = null;
       if (body.kakao_account) {
+        email = body.kakao_account.email;
         phone_number = body.kakao_account.phone_number;
       }
 
       return updateOrCreateUser(
         userId,
-        body.kaccount_email,
+        email,
         nickname,
         profileImage,
         phone_number
