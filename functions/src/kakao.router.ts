@@ -94,7 +94,7 @@ function requestMe(kakaoAccessToken: string) {
  * @param  {String} photoURL      profile photo url
  * @return {Prommise<UserRecord>} Firebase user record in a promise
  */
-function updateOrCreateUser(
+async function updateOrCreateUser(
   userId: string,
   email: string,
   displayName: string,
@@ -102,37 +102,37 @@ function updateOrCreateUser(
   phoneNumber: string
 ) {
   console.log("updating or creating a firebase user");
-  const updateParams: CreateRequest & { provider: string } = {
+  const createParams: CreateRequest & { provider: string } = {
     provider: "KAKAO",
     displayName: displayName,
     photoURL: undefined,
   };
   if (displayName) {
-    updateParams["displayName"] = displayName;
+    createParams["displayName"] = displayName;
   } else {
-    updateParams["displayName"] = email;
+    createParams["displayName"] = email;
   }
   if (email) {
-    updateParams["email"] = email;
+    createParams["email"] = email;
   }
   if (phoneNumber) {
-    updateParams["phoneNumber"] = phoneNumber;
+    createParams["phoneNumber"] = phoneNumber;
   }
   if (photoURL) {
-    updateParams["photoURL"] = photoURL;
+    createParams["photoURL"] = photoURL;
   }
 
-  console.log(updateParams);
+  console.log(createParams);
   return firebaseAdmin
     .auth()
-    .updateUser(userId, updateParams)
+    .updateUser(userId, { email, phoneNumber })
     .catch((error) => {
       if (error.code === "auth/user-not-found") {
-        updateParams["uid"] = userId;
+        createParams["uid"] = userId;
 
         return firebaseAdmin
           .auth()
-          .createUser(updateParams)
+          .createUser(createParams)
           .then((userRecord) => {
             const {
               uid,
