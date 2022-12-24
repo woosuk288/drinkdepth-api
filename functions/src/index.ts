@@ -33,6 +33,7 @@ const corsOptions: cors.CorsOptions = {
     if (whitelist.indexOf(origin ?? "") !== -1) {
       callback(null, true); // cors 허용
     } else {
+      functions.logger.info("Not allowed origin~~ : ", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
