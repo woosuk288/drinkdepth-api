@@ -24,8 +24,9 @@ const whitelist = [
   "https://www.drinkdepth.com",
   "https://offlineqr.drinkdepth.com",
   "https://offlineqrtablet.drinkdepth.com",
-  "localhost:5001",
+  "localhost:5001", // local emulator
   "localhost:5000",
+  "asia-northeast3-drinkdepth.cloudfunctions.net", // production build
 ];
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
