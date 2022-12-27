@@ -2,6 +2,9 @@
 service cloud.firestore {
   match /databases/{database}/documents {
 
+		function me(id) {
+    	return request.auth.uid == id || request.auth.uid == 'kakao:'+id;
+    }
   	function isSignedIn() {
       return request.auth != null;
     }
@@ -26,11 +29,6 @@ service cloud.firestore {
         // allow write;
       }
 
-    }
-
-    // 개발 및 빌드시 조회용
-    match /{path=**}/menus/{menuId} {
-      allow list;
     }
 
     match /cafes/{cafeId} {
@@ -65,5 +63,25 @@ service cloud.firestore {
         }
       }
     }
+
+
+    /* review */
+    match /reviews/{reviewId} {
+    	allow read: if isSignedIn();
+      allow update, delete: if request.auth.uid == resource.data.uid;
+      allow create: if isSignedIn();
+    }
+
+    match /profiles/{profileId} {
+    	allow read;
+    	allow create, update: if me(profileId);
+    }
+    match /profiles/{profileId}/privacies/{docId} {
+    	allow create, update: if (docId == 'flavor' || docId == 'keyword')
+      	&& request.resource.data.get('names', []).size() > 0
+        && me(profileId);
+    }
+
+
   }
 }
