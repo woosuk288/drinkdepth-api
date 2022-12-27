@@ -5,3 +5,6 @@ export const MENUES = "menus";
 export const REVIEWS = "reviews";
 export const PROFILES = "profiles";
 export const PRIVACIES = "privacies";
+export const COUPONS = "coupons";
+
+export const INFO = "info";
