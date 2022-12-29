@@ -122,6 +122,7 @@ function requestMe(kakaoAccessToken: string) {
 async function updateOrCreateUser(
   kakaoUID: string,
   email: string,
+  emailVerified: boolean,
   displayName: string,
   photoURL: string,
   phoneNumber: string
@@ -142,6 +143,9 @@ async function updateOrCreateUser(
 
     if (email) {
       createParams["email"] = email;
+    }
+    if (emailVerified) {
+      createParams["emailVerified"] = emailVerified;
     }
     if (phoneNumber) {
       createParams["phoneNumber"] = phoneNumber;
@@ -233,15 +237,18 @@ async function createFirebaseToken(
     profileImage = body.properties.profile_image;
   }
   let phone_number = null;
+  let is_email_verified = false;
   let email = null;
   if (body.kakao_account) {
     email = body.kakao_account.email;
     phone_number = body.kakao_account.phone_number;
+    is_email_verified = body.kakao_account.is_email_verified;
   }
 
   const userRecord = await updateOrCreateUser(
     kakaoUID,
     email,
+    is_email_verified,
     nickname,
     profileImage,
     phone_number

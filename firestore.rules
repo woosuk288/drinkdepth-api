@@ -68,7 +68,7 @@ service cloud.firestore {
     /* review */
     match /reviews/{reviewId} {
     	allow read: if isSignedIn();
-      allow update, delete: if request.auth.uid == resource.data.uid;
+      allow update, delete: if request.auth.uid == resource.data.profile.uid;
       allow create: if isSignedIn();
     }
 
@@ -80,6 +80,10 @@ service cloud.firestore {
     	allow create, update: if (docId == 'flavor' || docId == 'keyword')
       	&& request.resource.data.get('names', []).size() > 0
         && me(profileId);
+    }
+    match /profiles/{profileId}/badges/{badgeId} {
+      allow read;
+      allow create, update: if me(profileId);
     }
 
 
