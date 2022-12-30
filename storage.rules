@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // match /{allPaths=**} {
+    //   allow read, write: if false;
+    // }
+    match /images/{allPaths=**} {
+      allow read;
+      allow write: if request.auth.token.admin == true;
+    }
+
+    match /d/reviews/{reviewId}/{userId}/{imageFilename} {
+      allow read;
+      allow write: if request.auth.uid == userId;
+      // allow write: if true;
+    }
+    match /d/profiles/{profileId}/{imageFilename} {
+      allow read;
+      allow write: if request.auth.uid == profileId;
+    }
+  }
+}

@@ -3,11 +3,11 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start --only functions,firestore,auth --import ./backup",
+    "serve": "npm run build && firebase emulators:start --only functions,firestore,auth,storage --import ./backup",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "deploy:all": "firebase deploy --only functions,firestore",
+    "deploy:all": "firebase deploy --only functions,firestore,storage",
     "logs": "firebase functions:log",
     "backup": "firebase emulators:export ./backup"
   },
