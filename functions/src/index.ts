@@ -7,6 +7,7 @@ import * as cors from "cors";
 
 import kakaoRouter from "./kakao.router";
 import cafesRouter from "./cafes.router";
+import reviewsRouter from "./reviews.router";
 // import testRouter from "./test.router";
 
 // 어드민 초기화. 클라우드 함수, 호스팅만 사용할 경우 따로 설정파일을 넘겨주지 않아도 됨
@@ -49,6 +50,7 @@ app.use(function (req, res, next) {
 app.use(cors(corsOptions));
 app.use("/kakao", kakaoRouter);
 app.use("/cafes", cafesRouter);
+app.use("/reviews", reviewsRouter);
 // TODO: app.use("/owner", ownerRouter);
 // app.use("/test", testRouter);
 
