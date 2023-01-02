@@ -48,9 +48,20 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(cors(corsOptions));
+
+const checkServerKey = (req, res, next) => {
+  console.log("req.headers.authorization : ", req.headers.authorization);
+  console.log("server.key : ", functions.config().server.key);
+  if (req.headers.authorization !== functions.config().server.key) {
+    res.status(403).send("제한된 요청입니다.");
+    return;
+  }
+  next();
+};
+
 app.use("/kakao", kakaoRouter);
-app.use("/cafes", cafesRouter);
-app.use("/reviews", reviewsRouter);
+app.use("/cafes", checkServerKey, cafesRouter);
+app.use("/reviews", checkServerKey, reviewsRouter);
 // TODO: app.use("/owner", ownerRouter);
 // app.use("/test", testRouter);
 

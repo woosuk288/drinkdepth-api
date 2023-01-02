@@ -20,13 +20,6 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:cafe_id", async (req, res) => {
-  console.log("req.headers.authorization : ", req.headers.authorization);
-  console.log("server.key : ", functions.config().server.key);
-  if (req.headers.authorization !== functions.config().server.key) {
-    res.status(403).send("제한된 요청입니다.");
-    return;
-  }
-
   const snap = await db.collection(CAFES).doc(req.params.cafe_id).get();
 
   functions.logger.info("Hello cafe!", snap.exists);
@@ -55,13 +48,6 @@ router.get("/:cafe_id", async (req, res) => {
 // });
 
 router.get("/:any/all_menus", async (req, res) => {
-  console.log("req.headers.authorization : ", req.headers.authorization);
-  console.log("server.key : ", functions.config().server.key);
-  if (req.headers.authorization !== functions.config().server.key) {
-    res.status(403).send("제한된 요청입니다.");
-    return;
-  }
-
   const q = await db.collectionGroup(MENUES).get();
   const menus = q.docs.map((doc) => doc.data());
 
@@ -70,13 +56,6 @@ router.get("/:any/all_menus", async (req, res) => {
 });
 
 router.get("/:cafe_id/menus", async (req, res) => {
-  console.log("req.headers.authorization : ", req.headers.authorization);
-  console.log("server.key : ", functions.config().server.key);
-  if (req.headers.authorization !== functions.config().server.key) {
-    res.status(403).send("제한된 요청입니다.");
-    return;
-  }
-
   const cafeId = req.params.cafe_id;
   if (!cafeId) {
     res.status(401).send("잘못된 요청입니다.");
@@ -118,13 +97,6 @@ router.get("/:cafe_id/menus", async (req, res) => {
 // });
 
 router.get("/:cafe_id/pairing_menus/:menu_ids", async (req, res) => {
-  console.log("req.headers.authorization : ", req.headers.authorization);
-  console.log("server.key : ", functions.config().server.key);
-  if (req.headers.authorization !== functions.config().server.key) {
-    res.status(403).send("제한된 요청입니다.");
-    return;
-  }
-
   console.log("req.params : ", req.params);
   const { cafe_id, menu_ids } = req.params;
   if (!cafe_id || !menu_ids) {
@@ -152,13 +124,6 @@ router.get("/:cafe_id/pairing_menus/:menu_ids", async (req, res) => {
 });
 
 router.get("/:cafe_id/menus/:menu_id", async (req, res) => {
-  console.log("req.headers.authorization : ", req.headers.authorization);
-  console.log("server.key : ", functions.config().server.key);
-  if (req.headers.authorization !== functions.config().server.key) {
-    res.status(403).send("제한된 요청입니다.");
-    return;
-  }
-
   const { cafe_id, menu_id } = req.params;
   if (!cafe_id || !menu_id) {
     res.status(401).send("잘못된 요청입니다.");

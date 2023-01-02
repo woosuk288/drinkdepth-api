@@ -9,7 +9,6 @@ const router = express.Router();
 router.get("/:review_id", async (req, res) => {
   try {
     const id = req.params.review_id;
-    console.log("id : ", id);
 
     const snap = await firestore().collection(REVIEWS).doc(id).get();
     const data = snap.data();
@@ -21,18 +20,18 @@ router.get("/:review_id", async (req, res) => {
   }
 });
 
-router.post("/:review_id", async (req, res) => {
-  try {
-    const id = req.params.review_id;
-    const data = req.body;
-    await firestore().collection(REVIEWS).doc(id).set(data);
+// router.post("/:review_id", async (req, res) => {
+//   try {
+//     const id = req.params.review_id;
+//     const data = req.body;
+//     await firestore().collection(REVIEWS).doc(id).set(data);
 
-    functions.logger.info("Hello post review!", { data });
-    res.status(200).send(data);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//     functions.logger.info("Hello post review!", { data });
+//     res.status(200).send(data);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
 router.get("/", async (req, res) => {
   try {
